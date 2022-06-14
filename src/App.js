@@ -4,18 +4,20 @@ import data from "./words.json";
 let gameItems = [];
 
 function App() {
+  const [mainDivDisplay, setMainDivDisplay] = useState("none");
   const [pullDataStatus, setPullDataStatus] = useState(0);
   const [result, setResult] = useState("");
   const [pastWord, setPastWord] = useState("");
-  const [pastMatch, setPastMatch] = useState([""]);
-  const [disabled0, setDisabled0] = useState([true]);
-  const [disabled1, setDisabled1] = useState([true]);
-  const [disabled2, setDisabled2] = useState([true]);
-  const [disabled3, setDisabled3] = useState([true]);
-  const [disabled4, setDisabled4] = useState([true]);
-  const [disabled5, setDisabled5] = useState([true]);
+  const [pastMatch, setPastMatch] = useState("");
+  const [cardDisabled, setCardDisabled] = useState(false);
+  const [CardDisplay0, setCardDisplay0] = useState([true]);
+  const [CardDisplay1, setCardDisplay1] = useState([true]);
+  const [CardDisplay2, setCardDisplay2] = useState([true]);
+  const [CardDisplay3, setCardDisplay3] = useState([true]);
+  const [CardDisplay4, setCardDisplay4] = useState([true]);
+  const [CardDisplay5, setCardDisplay5] = useState([true]);
   const [cards, setCards] = useState(0);
-  //console.log(gameItems);
+  const [gameButtonText, setGameButtonText] = useState("Start Game");
   let category = "",
     randomCatagories = [
       "color",
@@ -37,6 +39,18 @@ function App() {
       "classroom",
       "numbers",
     ];
+
+  function startGame() {
+    setPullDataStatus(0);
+    setCardDisplayFunc(true);
+    setCardDisabled(false);
+    setMainDivDisplay("block");
+    setResult("");
+    setPastWord("");
+    setPastMatch("");
+    setCards(0);
+    setGameButtonText("Reset Game");
+  }
 
   const randomCatSelection = Math.trunc(Math.random() * 17);
 
@@ -88,84 +102,127 @@ function App() {
       ii++;
     }
   };
+
   if (pullDataStatus == 0) {
     setPullDataStatus(1);
     pulldata();
   }
-  //console.log(gameItems);
   const handleClick = (number, word, match) => {
-    console.log(number, word, match, cards);
+    //console.log(mainDivDisplay);
+    // console.log(
+    //   "card#:",
+    //   number,
+    //   "/ currentWord:",
+    //   word,
+    //   "/ pastWord:",
+    //   pastWord,
+    //   "/ current match:",
+    //   match,
+    //   "/ pastmatch",
+    //   pastMatch,
+    //   "#ofCards",
+    //   cards
+    // );
+
+    //turn over card that was clicked
     if (number == 0) {
-      setDisabled0(!disabled0);
+      setCardDisplay0(!CardDisplay0);
     } else if (number == 1) {
-      setDisabled1(!disabled1);
+      setCardDisplay1(!CardDisplay1);
     } else if (number == 2) {
-      setDisabled2(!disabled2);
+      setCardDisplay2(!CardDisplay2);
     } else if (number == 3) {
-      setDisabled3(!disabled3);
+      setCardDisplay3(!CardDisplay3);
     } else if (number == 4) {
-      setDisabled4(!disabled4);
+      setCardDisplay4(!CardDisplay4);
     } else if (number == 5) {
-      setDisabled5(!disabled5);
+      setCardDisplay5(!CardDisplay5);
     }
+    //**********************************************
+    // check it match is the same as the past match
     if (match == "x" && pastMatch == match) {
-      setResult(word, "-", pastWord, "  - match!!");
+      // we have a match!!!
+      setCardDisabled(true);
+      setResult(word + "-" + pastWord + "  - match!! 😁");
     } else {
+      // NO match!!
       if (cards == 0) {
+        // after 1st card selected
+        setResult("🤔");
         setCards(1);
         setPastMatch(match);
         setPastWord(word);
       } else {
+        // after 2nd card selected
+        setResult("NO match!! 😔");
+        setCardDisabled(true);
         setCards(0);
-
+        setPastWord("");
+        setPastMatch("");
         setTimeout(function () {
-          setDisabled0(true);
-          setDisabled1(true);
-          setDisabled2(true);
-          setDisabled3(true);
-          setDisabled4(true);
-          setDisabled5(true);
+          setCardDisplayFunc(true);
+          setCardDisabled(false);
+          setResult("Try again! 🤪 ");
         }, 2000);
       }
     }
   };
 
-  function addNotification() {} // add notification
-  return (
-    <div className="App">
-      <button
-        onClick={() => handleClick(0, gameItems[0].word, gameItems[0].match)}
-      >
-        {disabled0 ? "🔐" : gameItems[0].word}
+  function setCardDisplayFunc(value) {
+    setCardDisplay0(value);
+    setCardDisplay1(value);
+    setCardDisplay2(value);
+    setCardDisplay3(value);
+    setCardDisplay4(value);
+    setCardDisplay5(value);
+  }
 
-        {/* {gameItems[0].word} */}
-      </button>
-      <button
-        onClick={() => handleClick(1, gameItems[1].word, gameItems[1].match)}
-      >
-        {disabled1 ? "🔐" : gameItems[1].word}
-      </button>{" "}
-      <button
-        onClick={() => handleClick(2, gameItems[2].word, gameItems[2].match)}
-      >
-        {disabled2 ? "🔐" : gameItems[2].word}
-      </button>{" "}
-      <button
-        onClick={() => handleClick(3, gameItems[3].word, gameItems[3].match)}
-      >
-        {disabled3 ? "🔐" : gameItems[3].word}
-      </button>{" "}
-      <button
-        onClick={() => handleClick(4, gameItems[4].word, gameItems[4].match)}
-      >
-        {disabled4 ? "🔐" : gameItems[4].word}
-      </button>{" "}
-      <button
-        onClick={() => handleClick(5, gameItems[5].word, gameItems[5].match)}
-      >
-        {disabled5 ? "🔐" : gameItems[5].word}
-      </button>
-      <span>{result}</span>
+  return (
+    <div>
+      <div>
+        <button onClick={() => startGame()}>{gameButtonText}</button>
+      </div>
+      <div style={{ display: mainDivDisplay }}>
+        <button
+          disabled={cardDisabled}
+          onClick={() => handleClick(0, gameItems[0].word, gameItems[0].match)}
+        >
+          {CardDisplay0 ? "🔐" : gameItems[0].word}
+
+          {/* {gameItems[0].word} */}
+        </button>
+        <button
+          disabled={cardDisabled}
+          onClick={() => handleClick(1, gameItems[1].word, gameItems[1].match)}
+        >
+          {CardDisplay1 ? "🔐" : gameItems[1].word}
+        </button>{" "}
+        <button
+          disabled={cardDisabled}
+          onClick={() => handleClick(2, gameItems[2].word, gameItems[2].match)}
+        >
+          {CardDisplay2 ? "🔐" : gameItems[2].word}
+        </button>{" "}
+        <button
+          disabled={cardDisabled}
+          onClick={() => handleClick(3, gameItems[3].word, gameItems[3].match)}
+        >
+          {CardDisplay3 ? "🔐" : gameItems[3].word}
+        </button>{" "}
+        <button
+          disabled={cardDisabled}
+          onClick={() => handleClick(4, gameItems[4].word, gameItems[4].match)}
+        >
+          {CardDisplay4 ? "🔐" : gameItems[4].word}
+        </button>{" "}
+        <button
+          disabled={cardDisabled}
+          onClick={() => handleClick(5, gameItems[5].word, gameItems[5].match)}
+        >
+          {CardDisplay5 ? "🔐" : gameItems[5].word}
+        </button>
+        <span>{result}</span>
+      </div>
     </div>
   );
 }
